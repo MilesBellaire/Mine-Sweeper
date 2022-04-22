@@ -47,6 +47,37 @@ def printArr(arr):
     for i in range(len(arr)):
         print(arr[i])
 
+def gotoArea(pos, cmp, func, l):
+
+    # Bottom
+    if pos[0]+1 < l:
+        if cmp((pos[0]+1,pos[1])): 
+            func((pos[0]+1,pos[1])) # Bottom
+        # Bottom Right
+        if pos[1]+1 < l and cmp((pos[0]+1,pos[1]+1)): 
+            func((pos[0]+1,pos[1]+1))
+        # Bottom Left
+        if pos[1]-1 >= 0 and cmp((pos[0]+1,pos[1]-1)): 
+            func((pos[0]+1,pos[1]-1))
+    # Top
+    if pos[0]-1 >= 0:
+        if cmp((pos[0]-1,pos[1])): 
+            func((pos[0]-1,pos[1])) # Top
+        # Top Right
+        if pos[1]+1 < l and cmp((pos[0]-1,pos[1]+1)): 
+            func((pos[0]-1,pos[1]+1))
+        # Top Left
+        if pos[1]-1 >= 0 and cmp((pos[0]-1,pos[1]-1)): 
+            func((pos[0]-1,pos[1]-1))
+    # Right
+    if pos[1]+1 < l:
+        if cmp((pos[0],pos[1]+1)): 
+            func((pos[0],pos[1]+1)) # Right
+    # Left
+    if pos[1]-1 >= 0:
+        if cmp((pos[0],pos[1]-1)): 
+            func((pos[0]+1,pos[1]-1)) # Left
+
 def createBoard(s):
     for i in range(s):
         row = []
@@ -70,7 +101,15 @@ def createMap(board):
         for j in range(l):
             row.append((0,-1)[board[i][j]])
         map.append(row)
-        
+
+    def markPos2(pos):
+        def cmp(coord): 
+            return not board[coord[0]][coord[1]]
+        def func(coords): 
+            print("pass")
+            map[coords[0]][coords[1]] += 1
+        gotoArea(pos, cmp, func, size)
+
     def markPos(pos):
         # Bottom
         if pos[0]+1 < l:
