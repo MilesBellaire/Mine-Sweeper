@@ -1,19 +1,22 @@
 import random
 import pygame
 
-size = 10
+size = 15
 mines = int(size*size/5)
+flagsLeft = mines
 board = []
 map = []
 display = []
 moves = []
 
 running = True
+gameover = False
 BOXSIZE = 40
 SCREENSIZE = size*BOXSIZE
 pygame.init()
 pygame.font.init()
 normal_font = pygame.font.SysFont("comicsans", int(BOXSIZE/2))
+larger_font = pygame.font.SysFont("comicsans", 50)
 pygame.display.set_caption("Mine Sweeper")
 WIN = pygame.display.set_mode((SCREENSIZE, SCREENSIZE))
 
@@ -21,8 +24,8 @@ WIN = pygame.display.set_mode((SCREENSIZE, SCREENSIZE))
 def redraw(window):
     pygame.draw.rect(window, (0, 0, 0), (0, 0, SCREENSIZE, SCREENSIZE))
 
-    for i in range(len(display)):
-        for j in range(len(display)):
+    for j in range(len(display)):
+        for i in range(len(display)):
             if display[j][i] == ' ': 
                 pygame.draw.rect(window, (50, 50, 50), (j*BOXSIZE+1, i*BOXSIZE+1, BOXSIZE-2, BOXSIZE-2))
                 pygame.draw.rect(window, (100, 100, 100), (j*BOXSIZE+BOXSIZE/5, i*BOXSIZE+BOXSIZE/5, BOXSIZE-2*BOXSIZE/5, BOXSIZE-2*BOXSIZE/5))
@@ -37,15 +40,23 @@ def redraw(window):
             else:
                 num = normal_font.render(display[j][i], True, (255, 255, 255))
                 window.blit(num, (BOXSIZE/2 + j*BOXSIZE, BOXSIZE/2 + i*BOXSIZE))
-
+    
     for i in range(size-1):
         pygame.draw.rect(window, (255,255,255), (0, (i+1)*BOXSIZE-1, SCREENSIZE, 2))
         pygame.draw.rect(window, (255,255,255), ((i+1)*BOXSIZE-1, 0, 2, SCREENSIZE))
+
+    flagsleft = larger_font.render(str(flagsLeft), True, (225,225,225))
+    window.blit(flagsleft, (10,10))
     pygame.display.update()
 
 def printArr(arr):
     for i in range(len(arr)):
-        print(arr[i])
+        string = ""
+        for j in range(len(arr)):
+            if arr[j][i] != -1: string += " " + str(arr[j][i]) 
+            else: string += str(arr[j][i])
+            string += " "
+        print(string)
 
 def gotoArea(pos, cmp, func, l):
 
@@ -182,6 +193,9 @@ def showZeros(pos):
         click(pos[0]-1, pos[1]) # Left
 
 def click(x,y):
+    global flagsLeft, running
+    if display[y][x] == 'f':
+        flagsLeft += 1
     if map[y][x] < 0:                   # Hit mine
         display[y][x] = 'B'
         running = False
@@ -189,10 +203,14 @@ def click(x,y):
         display[y][x] = str(map[y][x])
         
 def flag(x,y):
+    global flagsLeft
+
     if display[y][x] == ' ':
-        display[y][x] = 'f'    
+        display[y][x] = 'f'
+        flagsLeft -= 1
     elif display[y][x] == 'f':
-        display[y][x] = ' '   
+        display[y][x] = ' '
+        flagsLeft += 1
 
 def playerMove():
 
